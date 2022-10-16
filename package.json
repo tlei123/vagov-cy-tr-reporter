@@ -1,0 +1,19 @@
+{
+  "name": "@tlei123/vagov-cy-tr-reporter",
+  "version": "0.0.1",
+  "description": "Mocha custom reporter for Cypress and TestRail.  Customized for VA.gov front-end.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tlei123/vagov-cy-tr-reporter.git"
+  },
+  "author": "Tze-chiu Lei",
+  "license": "CC0-1.0",
+  "bugs": {
+    "url": "https://github.com/tlei123/vagov-cy-tr-reporter/issues"
+  },
+  "homepage": "https://github.com/tlei123/vagov-cy-tr-reporter#readme"
+}
