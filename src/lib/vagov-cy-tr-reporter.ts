@@ -30,11 +30,6 @@ export class VagovCyTrReporter {
   constructor(runner: any, options: any) {
     const stats = runner.stats;
     const reporterOpts = options.reporterOptions;
-
-    console.log(
-      '[VagovCyTrReporter once-run-begin] _reporterOptions:',
-      reporterOpts,
-    );
     // exit if reporter options are incomplete/invalid.
     if (!utils.validateReporterOptions(reporterOpts)) {
       throw new Error('reporterOptions are incomplete or invalid!');
@@ -44,22 +39,30 @@ export class VagovCyTrReporter {
     this._trAgent = new TestRailAgent(this._reporterOptions);
     this._indents = 0;
 
+    console.log(console.log('Using VA.GOV CYPRESS TESTRAIL REPORTER (VCTR)'));
+    console.log('[VCTR] _reporterOptions:');
+    console.log(reporterOpts);
+
     runner
       .once(EVENT_RUN_BEGIN, () => {
-        console.log('start');
+        console.log('[VCTR] RUN START');
         // get testrail case IDs
         this._trCaseIds = this._trAgent.fetchCases();
       })
       .on(EVENT_SUITE_BEGIN, (suite: any) => {
         // do NOT make TestRail API-calls here.
-        // an existing Mocha bug fires suite-begin event twice.
+        // an existing Mocha bug fires EVENT_SUITE_BEGIN event twice.
+        let logStr = '';
         this.increaseIndent();
         if (suite.title) {
+          console.log('[VCTR] SUITE START');
           this._suiteTitle = suite.title;
           if (!this._suiteTitleLogged) {
-            console.log(
-              `[VagovCyTrReporter on-suite-begin] Suite title: ${this._suiteTitle}`,
-            );
+            logStr = `[VCTR] Suite title: ${this._suiteTitle}`;
+            console.log(logStr);
+            // console.log(
+            //   `[VagovCyTrReporter on-suite-begin] Suite title: ${this._suiteTitle}`,
+            // );
             this._suiteTitleLogged = true;
           }
         }
@@ -94,10 +97,11 @@ export class VagovCyTrReporter {
       })
       .on(EVENT_SUITE_END, () => {
         // do NOT make TestRail API-calls here.
-        // an existing Mocha bug fires suite-end event twice.
+        // an existing Mocha bug fires EVENT_SUITE_END event twice.
         if (!this._cyCaseIdsLogged) {
+          console.log('[VCTR] SUITE END');
           console.log(
-            '[VagovCyTrReporter on-suite-end] Case IDs extracted from Cypress spec:\n',
+            '[VCTR] Case IDs extracted from Cypress spec:\n',
             this._cyCaseIds,
           );
           this._cyCaseIdsLogged = true;
@@ -105,22 +109,22 @@ export class VagovCyTrReporter {
         this.decreaseIndent();
       })
       .once(EVENT_RUN_END, () => {
-        console.log(`end: ${stats.passes}/${stats.passes + stats.failures} ok`);
+        console.log(
+          `[VCTR] RUN END: ${stats.passes}/${stats.passes + stats.failures} ok`,
+        );
 
         // Check Cypress case IDs against those from TestRail
         if (this._trCaseIds) {
           console.log(
-            `[VagovCyTrReporter on-run-end] Case IDs fetched from TestRail:\n`,
+            `[VCTR] Case IDs fetched from TestRail:\n`,
             this._cyCaseIds,
           );
 
           if (utils.matchCaseIdArrays(this._cyCaseIds, this._trCaseIds)) {
-            console.log(
-              '[VagovCyTrReporter on-run-end] Cypress and TestRail case IDs match.',
-            );
+            console.log('[VCTR] Cypress and TestRail case IDs match.');
           } else {
             console.warn(
-              '[VagovCyTrReporter on-run-end] WARNING: Cypress and TestRail case IDs do not match!',
+              '[VCTR] WARNING: Cypress and TestRail case IDs do not match!',
             );
           }
 
@@ -131,7 +135,7 @@ export class VagovCyTrReporter {
           );
           if (this._trRunId) {
             console.log(
-              `[VagovCyTrReporter on-run-end] Test run added to TestRail.  Run ID: ${this._trRunId}`,
+              `[VCTR] Test run added to TestRail.  Run ID: ${this._trRunId}`,
             );
           } else {
             throw new Error('TestRail run ID not received.');
@@ -146,7 +150,7 @@ export class VagovCyTrReporter {
           );
           if (this._trResults) {
             console.log(
-              '[VagovCyTrReporter on-run-end] TestRail results posted. Returned data:',
+              '[VCTR] TestRail results posted. Returned data:',
               this._trResults,
             );
           } else {
@@ -157,10 +161,10 @@ export class VagovCyTrReporter {
             this._trRunName = this._trAgent.closeRun(this._trRunId as number);
             if (this._trRunName) {
               console.log(
-                `[VagovCyTrReporter on-run-end] TestRail run closed.  Returned run name: ${this._trRunName}`,
+                `[VCTR] TestRail run closed.  Returned run name: ${this._trRunName}`,
               );
               console.log(
-                `[VagovCyTrReporter on-run-end] Run should be viewable at:\n${this._reporterOptions.host}index.php?/runs/view/${this._trRunId}`,
+                `[VCTR] Run should be viewable at:\n${this._reporterOptions.host}index.php?/runs/view/${this._trRunId}`,
               );
             } else {
               throw new Error('TestRail run name not received.');
