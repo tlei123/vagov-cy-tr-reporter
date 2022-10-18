@@ -57,6 +57,11 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@types/deasync@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@types/deasync/-/deasync-0.1.2.tgz#a64b68d6ebc145d0a5fe004a53e8e0f4e6d2ec7e"
+  integrity sha512-sCBFlGCEmZMPS06wdnQELcYzyUYio2K1Hp6g0fjJSKP1jkGKQpIdjRNUQAvdSCCJCWxIMCkX2CL7pi4BCm8Ydg==
+
 "@types/json-schema@^7.0.9":
   version "7.0.11"
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.11.tgz#d421b6c527a3037f7c84433fd2c4229e016863d3"
