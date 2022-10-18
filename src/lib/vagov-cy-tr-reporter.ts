@@ -133,6 +133,8 @@ export class VagovCyTrReporter {
             console.log(
               `[VagovCyTrReporter on-run-end] Test run added to TestRail.  Run ID: ${this._trRunId}`,
             );
+          } else {
+            throw new Error('TestRail run ID not received.');
           }
         }
 
@@ -147,6 +149,8 @@ export class VagovCyTrReporter {
               '[VagovCyTrReporter on-run-end] TestRail results posted. Returned data:',
               this._trResults,
             );
+          } else {
+            throw new Error('No TestRail results received.');
           }
           // close TestRail run.
           if (this._trResults) {
