@@ -155,6 +155,11 @@ export class VagovCyTrReporter {
               console.log(
                 `[VagovCyTrReporter on-run-end] TestRail run closed.  Returned run name: ${this._trRunName}`,
               );
+              console.log(
+                `[VagovCyTrReporter on-run-end] Run should be viewable at:\n${this._reporterOptions.host}index.php?/runs/view/${this._trRunId}`,
+              );
+            } else {
+              throw new Error('TestRail run name not received.');
             }
           }
         } else {
