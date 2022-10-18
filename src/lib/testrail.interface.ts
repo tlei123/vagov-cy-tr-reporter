@@ -4,9 +4,10 @@ export interface TestRailOptions {
   password: string;
   projectId: number;
   suiteId: number;
+  groupId: number;
+  runName: string;
   assignedToId?: number;
   includeAllInTestRun?: boolean;
-  groupId?: number;
   filter?: string;
   typeId?: number;
 }
@@ -22,6 +23,7 @@ export enum Status {
 export interface TestRailResult {
   case_id: number;
   status_id: Status;
+  elapsed: string;
   comment?: string;
 }
 
