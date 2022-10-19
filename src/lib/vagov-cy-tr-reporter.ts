@@ -45,7 +45,10 @@ export class VagovCyTrReporter {
     console.log(
       chalk.bold.yellow('Using VA.GOV CYPRESS TESTRAIL REPORTER (VCTR)'),
     );
-    this._trLogger.logObj('_cyRptrOpts:', this._cyRptrOpts);
+    this._trLogger.logObj(
+      '_cyRptrOpts:',
+      Object.assign({}, this._cyRptrOpts, { password: '[obfuscated]' }),
+    );
 
     runner
       .once(EVENT_RUN_BEGIN, () => {
