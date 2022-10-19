@@ -1,5 +1,4 @@
 import Mocha from 'mocha';
-import chalk from 'chalk';
 
 import { TestRailOptions, TestRailResult, Status } from './testrail.interface';
 import { TestRailAgent } from './testrail-agent';
@@ -93,7 +92,7 @@ export class VagovCyTrReporter {
           `Stats: ${stats.passes}/${stats.passes + stats.failures} ok`,
         );
         this._trLogger.log('\nCase IDs extracted from Cypress spec:');
-        console.log(chalk.bold.yellow(`${this._cyCaseIds.join(', ')}`));
+        this._trLogger.log(`${this._cyCaseIds.join(', ')}`);
         // Check Cypress case IDs against those from TestRail
         if (this._trCaseIds) {
           this._trLogger.log('Case IDs fetched from TestRail:');
@@ -135,10 +134,10 @@ export class VagovCyTrReporter {
           if (this._trResults) {
             this._trRunName = this._trAgent.closeRun(this._trRunId as number);
             if (this._trRunName) {
-              console.log(
-                chalk.bold.green('TestRail run closed.  Run name returned: '),
-                `${this._trRunName}`,
+              this._trLogger.success(
+                'TESTRAIL RUN CLOSED.  Run name returned: ',
               );
+              console.log(`${this._trRunName}`);
               this._trLogger.success(
                 `Run should be viewable at:\n${this._cyRptrOpts.host}index.php?/runs/view/${this._trRunId}`,
               );
