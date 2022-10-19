@@ -1,1 +1,4 @@
-ts/
+.src/
+.vscode/
+*.log
+tsconfig.json
