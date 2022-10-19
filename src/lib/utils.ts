@@ -58,13 +58,6 @@ export function getTrElapsedStringFromMsecs(ms: number): string {
   return `${min ? min + 'm ' : ''}${sec}s`;
 }
 
-export function matchCaseIdArrays(arr1: number[], arr2: number[]): boolean {
-  return (
-    arr1.length === arr2.length &&
-    arr1.every((value, index) => value === arr2[index])
-  );
-}
-
 export function getDateTimeString(): string {
   const zNow = new Date();
   const offset = zNow.getTimezoneOffset();

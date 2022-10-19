@@ -51,7 +51,7 @@ export class TestRailAgent {
     );
   }
 
-  public createRun(caseIds: number[], suiteTitle = '[unknown]') {
+  public createRun(caseIds: number[]) {
     // adds test-run to TestRail, returns run ID.
 
     return this._makeSync(
@@ -66,7 +66,7 @@ export class TestRailAgent {
         data: JSON.stringify({
           suite_id: this.options.suiteId,
           name: `${this.options.runName} ${getDateTimeString()}`,
-          description: `Local Cypress E2E spec run.  Cypress suite title: ${suiteTitle}`,
+          description: 'Local Cypress E2E spec run.',
           include_all: this.options.includeAllInTestRun,
           case_ids: caseIds,
         }),
