@@ -16,18 +16,22 @@ const {
 } = Mocha.Runner.constants;
 
 export class VagovCyTrReporter {
-  private _reporterOptions: TestRailOptions;
-  private _trAgent: TestRailAgent;
-  private _suiteTitle = '';
-  private _suiteTitleLogged = false;
-  private _cyCaseIdsLogged = false;
   private _indents: number;
+  private _trAgent: TestRailAgent;
+
+  // Cypress config/spec
+  private _cyRptrOpts: TestRailOptions;
+  private _cySuiteTitle = '';
+  private _cySuiteTitleLogged = false;
+  private _cyCaseIdsLogged = false;
   private _cyCaseIds: number[] = [];
-  private _cyResults: TestRailResult[] = []; // outgoing results object-array
+  private _cyResults: TestRailResult[] = [];
+
+  // incoming from TestRail
   private _trCaseIds: number[] | undefined;
   private _trRunId: number | undefined;
   private _trResults: any[] | undefined;
-  private _trRunName: string | undefined; // incoming TestRail-results object-array
+  private _trRunName: string | undefined;
 
   constructor(runner: any, options: any) {
     const stats = runner.stats;
@@ -37,17 +41,17 @@ export class VagovCyTrReporter {
       throw new Error('reporterOptions are incomplete or invalid!');
     }
 
-    this._reporterOptions = options.reporterOptions;
-    this._trAgent = new TestRailAgent(this._reporterOptions);
+    this._cyRptrOpts = options.reporterOptions;
+    this._trAgent = new TestRailAgent(this._cyRptrOpts);
     this._indents = 0;
 
     console.log(
       chalk.bold.yellow('Using VA.GOV CYPRESS TESTRAIL REPORTER (VCTR)'),
     );
-    console.log(chalk.bold.yellow('[VCTR] _reporterOptions:'));
+    console.log(chalk.bold.yellow('[VCTR] _cyRptrOpts:'));
     console.log(
       chalk.bold.yellow(
-        util.inspect(this._reporterOptions, { colors: true, depth: null }),
+        util.inspect(this._cyRptrOpts, { colors: true, depth: null }),
       ),
     );
 
@@ -63,12 +67,12 @@ export class VagovCyTrReporter {
         this.increaseIndent();
         if (suite.title) {
           console.log(chalk.bold.yellow('[VCTR] SUITE START'));
-          this._suiteTitle = suite.title;
-          if (!this._suiteTitleLogged) {
+          this._cySuiteTitle = suite.title;
+          if (!this._cySuiteTitleLogged) {
             console.log(
-              chalk.bold.yellow(`[VCTR] Suite title: ${this._suiteTitle}`),
+              chalk.bold.yellow(`[VCTR] Suite title: ${this._cySuiteTitle}`),
             );
-            this._suiteTitleLogged = true;
+            this._cySuiteTitleLogged = true;
           }
         }
       })
@@ -151,7 +155,7 @@ export class VagovCyTrReporter {
           // create TestRail test run.
           this._trRunId = this._trAgent.createRun(
             this._trCaseIds,
-            this._suiteTitle,
+            this._cySuiteTitle,
           );
           if (this._trRunId) {
             console.log(
@@ -193,7 +197,7 @@ export class VagovCyTrReporter {
               );
               console.log(
                 chalk.bold.green(
-                  `[VCTR] Run should be viewable at:\n${this._reporterOptions.host}index.php?/runs/view/${this._trRunId}`,
+                  `[VCTR] Run should be viewable at:\n${this._cyRptrOpts.host}index.php?/runs/view/${this._trRunId}`,
                 ),
               );
             } else {
