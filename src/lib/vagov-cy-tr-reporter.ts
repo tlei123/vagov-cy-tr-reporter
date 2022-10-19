@@ -105,7 +105,7 @@ export class VagovCyTrReporter {
           this._trRunId = this._trAgent.createRun(this._trCaseIds);
           if (this._trRunId) {
             this._trLogger.success(
-              'Test run added to TestRail.  Run ID returned: ',
+              'TEST RUN ADDED to TestRail.  Run ID returned: ',
             );
             console.log(`${this._trRunId}`);
           } else {
@@ -121,7 +121,7 @@ export class VagovCyTrReporter {
           );
           if (this._trResults) {
             this._trLogger.success(
-              'TestRail results posted. Results data returned:',
+              'TEST RESULTS POSTED to TestRail. Results data returned:',
             );
             console.log(this._trResults);
           } else {
