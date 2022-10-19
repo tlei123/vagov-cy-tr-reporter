@@ -6,14 +6,8 @@ import { TestRailAgent } from './testrail-agent';
 import { TestRailLogger } from './testrail-logger';
 import * as utils from './utils';
 
-const {
-  EVENT_RUN_BEGIN,
-  EVENT_RUN_END,
-  EVENT_TEST_FAIL,
-  EVENT_TEST_PASS,
-  EVENT_SUITE_BEGIN,
-  EVENT_SUITE_END,
-} = Mocha.Runner.constants;
+const { EVENT_RUN_BEGIN, EVENT_RUN_END, EVENT_TEST_FAIL, EVENT_TEST_PASS } =
+  Mocha.Runner.constants;
 
 export class VagovCyTrReporter {
   private _trAgent: TestRailAgent;
@@ -27,28 +21,33 @@ export class VagovCyTrReporter {
   // incoming from TestRail
   private _trCaseIds: number[] | undefined;
   private _trRunId: number | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private _trResults: any[] | undefined;
   private _trRunName: string | undefined;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(runner: any, options: any) {
     const stats = runner.stats;
-    const reporterOpts = options.reporterOptions;
-    // exit if reporter options are incomplete/invalid.
-    if (!utils.validateReporterOptions(reporterOpts)) {
-      throw new Error('reporterOptions are incomplete or invalid!');
-    }
 
     this._cyRptrOpts = options.reporterOptions;
     this._trAgent = new TestRailAgent(this._cyRptrOpts);
     this._trLogger = new TestRailLogger();
 
-    console.log(
-      chalk.bold.yellow('Using VA.GOV CYPRESS TESTRAIL REPORTER (VCTR)'),
-    );
-    this._trLogger.logObj(
-      '_cyRptrOpts:',
-      Object.assign({}, this._cyRptrOpts, { password: '[obfuscated]' }),
-    );
+    this._trLogger.log('Using VA.GOV CYPRESS TESTRAIL REPORTER (VCTR)');
+
+    // validate reporterOptions, exit if incomplete/invalid.
+    if (!utils.validateReporterOptions(this._cyRptrOpts)) {
+      this._trLogger.errorObj(
+        'Cypress reporterOptions are incomplete or invalid! Here are the options retrieved (if any):',
+        utils.getPwObfuscatedRptrOpts(this._cyRptrOpts),
+      );
+      process.exit(1);
+    } else {
+      this._trLogger.logObj(
+        '_cyRptrOpts:',
+        utils.getPwObfuscatedRptrOpts(this._cyRptrOpts),
+      );
+    }
 
     runner
       .once(EVENT_RUN_BEGIN, () => {
@@ -56,6 +55,7 @@ export class VagovCyTrReporter {
         // get testrail case IDs
         this._trCaseIds = this._trAgent.fetchCases();
       })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .on(EVENT_TEST_PASS, (test: any) => {
         const title = test.title;
         const duration = test.duration;
@@ -70,6 +70,7 @@ export class VagovCyTrReporter {
         });
         this._trLogger.success(`  Pass [${duration}ms]: ${title}`);
       })
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .on(EVENT_TEST_FAIL, (test: any, err: any) => {
         const title = test.title;
         const duration = test.duration;

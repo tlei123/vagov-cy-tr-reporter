@@ -21,6 +21,13 @@ export class TestRailLogger {
     console.log(chalk.bold.red('[VCTR] ERROR:', text));
   }
 
+  errorObj(text: string, obj: any): void {
+    console.log(
+      chalk.bold.red('[VCTR]', text),
+      chalk.bold.red(util.inspect(obj, { colors: true, depth: null })),
+    );
+  }
+
   warn(text: string): void {
     console.log(chalk.bold.keyword('orange')('[VCTR] WARNING:', text));
   }

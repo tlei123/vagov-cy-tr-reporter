@@ -22,17 +22,34 @@ function _getTimeZoneAcronym(timeZoneStr: string): string {
   return `${abbrevs[zoneKey]}${abbrevs[dsKey]}T`;
 }
 
+export function getPwObfuscatedRptrOpts(
+  rptrOpts: TestRailOptions,
+): TestRailOptions {
+  // returns reporter-options object with password value obfuscated.
+  return Object.assign({}, rptrOpts, { password: '[obfuscated]' });
+}
+
 export function validateReporterOptions(rptrOpts: TestRailOptions): boolean {
+  // checks reporter-options.  returns true if complete & valid.
+  const { username, password, projectId, suiteId, groupId, runName } = rptrOpts;
+  const stringIsGood = (prop: string): boolean => {
+    return prop !== undefined && prop.length > 0;
+  };
+  const numberIsGood = (prop: number): boolean => {
+    return prop !== undefined && prop > 0;
+  };
+
   return (
-    rptrOpts.username !== undefined &&
-    rptrOpts.password !== undefined &&
-    rptrOpts.projectId !== undefined &&
-    rptrOpts.suiteId !== undefined &&
-    rptrOpts.groupId !== undefined &&
-    rptrOpts.runName !== undefined
+    stringIsGood(username) &&
+    stringIsGood(password) &&
+    numberIsGood(projectId) &&
+    numberIsGood(suiteId) &&
+    numberIsGood(groupId) &&
+    stringIsGood(runName)
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getIdFromTestRailCase(c: any): number {
   return c.id;
 }
@@ -60,7 +77,6 @@ export function getTrElapsedStringFromMsecs(ms: number): string {
 
 export function getDateTimeString(): string {
   const zNow = new Date();
-  const offset = zNow.getTimezoneOffset();
   const localDateStr = zNow.toLocaleDateString();
   const localTimeStr = zNow.toLocaleTimeString();
   const timeStr = zNow.toTimeString();
