@@ -5,13 +5,13 @@ import { TestRailOptions, TestRailResult } from './testrail.interface';
 import { getDateTimeString } from './utils';
 
 export class TestRailAgent {
-  private _host: string | undefined;
+  private _cyReporterOptions: TestRailOptions;
   private _apiPath = '/index.php?/api/v2/';
   private _runId: number | undefined;
   private _caseIds = [];
 
   constructor(private options: TestRailOptions) {
-    this._host = options.host;
+    this._cyReporterOptions = options;
   }
 
   /**
@@ -34,7 +34,7 @@ export class TestRailAgent {
     return this._makeSync(
       axios({
         method: 'get',
-        url: `${this._host}${this._apiPath}get_cases/${this.options.projectId}&suite_id=${this.options.suiteId}&section_id=${this.options.groupId}`,
+        url: `${this._cyReporterOptions.host}${this._apiPath}get_cases/${this.options.projectId}&suite_id=${this.options.suiteId}&section_id=${this.options.groupId}`,
         headers: { 'Content-Type': 'application/json' },
         auth: {
           username: this.options.username,
@@ -57,7 +57,7 @@ export class TestRailAgent {
     return this._makeSync(
       axios({
         method: 'post',
-        url: `${this._host}${this._apiPath}add_run/${this.options.projectId}`,
+        url: `${this._cyReporterOptions.host}${this._apiPath}add_run/${this.options.projectId}`,
         headers: { 'Content-Type': 'application/json' },
         auth: {
           username: this.options.username,
@@ -86,11 +86,11 @@ export class TestRailAgent {
     return this._makeSync(
       axios({
         method: 'post',
-        url: `${this._host}${this._apiPath}add_results_for_cases/${runId}`,
+        url: `${this._cyReporterOptions.host}${this._apiPath}add_results_for_cases/${runId}`,
         headers: { 'Content-Type': 'application/json' },
         auth: {
-          username: this.options.username,
-          password: this.options.password,
+          username: this._cyReporterOptions.username,
+          password: this._cyReporterOptions.password,
         },
         data: JSON.stringify({ results: cyResults }),
       })
@@ -109,7 +109,7 @@ export class TestRailAgent {
     return this._makeSync(
       axios({
         method: 'post',
-        url: `${this._host}${this._apiPath}close_run/${runId}`,
+        url: `${this._cyReporterOptions.host}${this._apiPath}close_run/${runId}`,
         headers: { 'Content-Type': 'application/json' },
         auth: {
           username: this.options.username,
