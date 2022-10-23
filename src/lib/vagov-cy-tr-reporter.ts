@@ -20,9 +20,6 @@ export class VagovCyTrReporter {
   // incoming from TestRail
   private _trCaseIds: number[] | undefined;
   private _trRunId: number | undefined;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private _trResults: any[] | undefined;
-  private _trRunName: string | undefined;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(runner: any, options: any) {
@@ -51,8 +48,6 @@ export class VagovCyTrReporter {
     runner
       .once(EVENT_RUN_BEGIN, () => {
         this._trLogger.log('RUN START');
-        // get testrail case IDs
-        this._trCaseIds = this._trAgent.fetchCases();
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .on(EVENT_TEST_PASS, (test: any) => {
@@ -91,60 +86,15 @@ export class VagovCyTrReporter {
         this._trLogger.log(
           `Stats: ${stats.passes}/${stats.passes + stats.failures} ok`,
         );
-        this._trLogger.log('\nCase IDs extracted from Cypress spec:');
-        this._trLogger.log(`${this._cyCaseIds.join(', ')}`);
-        // Check Cypress case IDs against those from TestRail
-        if (this._trCaseIds) {
-          this._trLogger.log('Case IDs fetched from TestRail:');
-          console.log(`${this._cyCaseIds.join(', ')}`);
-
-          if (this._cyCaseIds.length !== this._trCaseIds.length) {
-            this._trLogger.warn(
-              'WARNING: Case-ID counts mismatch between Cypress spec and TestRail section!',
-            );
-          }
-
-          // create TestRail test run.
-          this._trRunId = this._trAgent.createRun(this._trCaseIds);
-          if (this._trRunId) {
-            this._trLogger.success(
-              'TEST RUN ADDED to TestRail.  Run ID returned: ',
-            );
-            console.log(`${this._trRunId}`);
-          } else {
-            throw new Error('TestRail run ID not received.');
-          }
-        }
+        this._trLogger.log(
+          `Case IDs extracted from Cypress spec:\n${this._cyCaseIds.join(
+            ', ',
+          )}`,
+        );
 
         // post results to TestRail.
         if (this._cyResults.length) {
-          this._trResults = this._trAgent.reportResults(
-            this._trRunId as number,
-            this._cyResults,
-          );
-          if (this._trResults) {
-            this._trLogger.success(
-              'TEST RESULTS POSTED to TestRail. Results data returned:',
-            );
-            console.log(this._trResults);
-          } else {
-            throw new Error('No TestRail results received.');
-          }
-          // close TestRail run.
-          if (this._trResults) {
-            this._trRunName = this._trAgent.closeRun(this._trRunId as number);
-            if (this._trRunName) {
-              this._trLogger.success(
-                'TESTRAIL RUN CLOSED.  Run name returned: ',
-              );
-              console.log(`${this._trRunName}`);
-              this._trLogger.success(
-                `Run should be viewable at:\n${this._cyRptrOpts.host}index.php?/runs/view/${this._trRunId}`,
-              );
-            } else {
-              throw new Error('TestRail run name not received.');
-            }
-          }
+          this._trAgent.reportResults(this._cyResults);
         } else {
           throw new Error('No results from Cypress run!');
         }
