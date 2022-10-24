@@ -11,7 +11,7 @@ export class TestRailAgent {
   public reportResults(cyResults: TestRailResult[]) {
     /**
      * To work around a Cypress issue where Mocha exits before async requests
-     * finish, we spawn a Node child-process to post results to TestRail.
+     * finish, we spawn a Node child-process to interact TestRail.
      * see this Cypress issue:
      * https://github.com/cypress-io/cypress/issues/7139#issuecomment-1074747820
      */
@@ -19,7 +19,7 @@ export class TestRailAgent {
       apiPath: this._apiPath,
     });
 
-    return spawnSync('node', [`${__dirname}/testrail-post-results.js`], {
+    spawnSync('node', [`${__dirname}/testrail-post-results.js`], {
       stdio: 'inherit',
       env: Object.assign(process.env, {
         NODE_TLS_REJECT_UNAUTHORIZED: 1,

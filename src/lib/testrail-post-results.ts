@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from 'axios';
 
 import { TestRailResult } from './testrail.interface';
@@ -20,13 +21,7 @@ function fetchCases() {
       username: trOptions.username,
       password: trOptions.password,
     },
-  })
-    .then((response) => {
-      return response.data.cases.map((item: any) => item.id);
-    })
-    .catch((error) => {
-      throw new Error(`get_cases API-call FAILED: ${error.message}`);
-    });
+  });
 }
 
 function createRun(caseIds: number[]) {
@@ -46,13 +41,7 @@ function createRun(caseIds: number[]) {
       include_all: trOptions.includeAllInTestRun,
       case_ids: caseIds,
     }),
-  })
-    .then((response) => {
-      return response.data.id;
-    })
-    .catch((error) => {
-      throw new Error(`add_run API-call FAILED: ${error.message}`);
-    });
+  });
 }
 
 function postResults(runId: number) {
@@ -66,15 +55,7 @@ function postResults(runId: number) {
       password: trOptions.password,
     },
     data: JSON.stringify({ results: cyResults }),
-  })
-    .then((response) => {
-      return response.data;
-    })
-    .catch((error) => {
-      throw new Error(
-        `add_results_for_cases API-call FAILED: ${error.message}`,
-      );
-    });
+  });
 }
 
 function closeRun(runId: number) {
@@ -87,45 +68,80 @@ function closeRun(runId: number) {
       username: trOptions.username,
       password: trOptions.password,
     },
-  })
-    .then((response) => {
-      return response.data.name;
-    })
-    .catch((error) => {
-      throw new Error(`close_run API-call FAILED: ${error.message}`);
-    });
+  });
 }
 
 // Get cases, add run, add results, then close run.
-fetchCases().then((caseIds: number[]) => {
-  trLogger.log('Case IDs fetched from TestRail:');
-  console.log(caseIds.join(', '));
-  if (caseIds.length !== cyCaseIds.length) {
-    trLogger.warn(
-      'Cypress Case-IDs count does NOT match TestRail Case-IDs count.',
-    );
-  } else {
-    trLogger.log('Cypress Case-IDs count matches TestRail Case-IDs count.');
-  }
+fetchCases()
+  .then((response: any) => {
+    const caseIds = response.data.cases.map((item: any) => item.id);
 
-  createRun(caseIds).then((runId: number) => {
-    trRunId = runId;
-    trLogger.success('TEST RUN ADDED to TestRail.  Run ID returned:');
-    console.log(trRunId);
-
-    postResults(runId).then((resultsData: any) => {
-      trLogger.success(
-        'TESTRAIL RESULTS POSTED to TestRail.  Results data returned:',
+    trLogger.log('Case IDs fetched from TestRail:');
+    console.log(caseIds.join(', '));
+    if (caseIds.length !== cyCaseIds.length) {
+      trLogger.warn(
+        'Cypress Case-IDs count does NOT match TestRail Case-IDs count.',
       );
-      console.log(resultsData);
+    } else {
+      trLogger.log('Cypress Case-IDs count matches TestRail Case-IDs count.');
+    }
 
-      closeRun(trRunId).then((runName: string) => {
-        trLogger.success('TESTRAIL RUN CLOSED.  Run name returned:');
-        console.log(runName);
-        trLogger.success(
-          `Run should be viewable at:\n${trOptions.host}index.php?/runs/view/${trRunId}`,
+    createRun(caseIds)
+      .then((response: any) => {
+        const runId = response.data.id;
+
+        trRunId = runId;
+        trLogger.success('TEST RUN ADDED to TestRail.  Run ID returned:');
+        console.log(trRunId);
+
+        postResults(runId)
+          .then((response: any) => {
+            const resultsData = response.data;
+
+            trLogger.success(
+              'TESTRAIL RESULTS POSTED to TestRail.  Results data returned:',
+            );
+            console.log(resultsData);
+
+            closeRun(trRunId)
+              .then((response: any) => {
+                const runName = response.data.name;
+
+                trLogger.success('TESTRAIL RUN CLOSED.  Run name returned:');
+                console.log(runName);
+                trLogger.success(
+                  `Run should be viewable at:\n${trOptions.host}index.php?/runs/view/${trRunId}`,
+                );
+              })
+              .catch((err: any) => {
+                trLogger.errorObj('closeRun method FAILED! ', err);
+                trLogger.log(
+                  "If output is missing when you scroll back to top of shell window, increase your shell's screen-buffer size.",
+                );
+                process.exit(1);
+              });
+          })
+          .catch((err: any) => {
+            trLogger.errorObj('postResults method FAILED! ', err);
+            trLogger.log(
+              "If output is missing when you scroll back to top of shell window, increase your shell's screen-buffer size.",
+            );
+            process.exit(1);
+          });
+      })
+      .catch((err: any) => {
+        trLogger.errorObj('createRun method FAILED! ', err);
+        trLogger.log(
+          "If output is missing when you scroll back to top of shell window, increase your shell's screen-buffer size.",
         );
+        process.exit(1);
       });
-    });
+  })
+  .catch((err: any) => {
+    trLogger.errorObj('fetchCases method FAILED! ', err);
+    trLogger.log(
+      "If output is missing when you scroll back to top of shell window, increase your shell's screen-buffer size.",
+    );
+    process.exit(1);
   });
-});
+/* eslint-enable @typescript-eslint/no-explicit-any */

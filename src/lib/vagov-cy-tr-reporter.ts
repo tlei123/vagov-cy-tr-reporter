@@ -17,10 +17,6 @@ export class VagovCyTrReporter {
   private _cyCaseIds: number[] = [];
   private _cyResults: TestRailResult[] = [];
 
-  // incoming from TestRail
-  private _trCaseIds: number[] | undefined;
-  private _trRunId: number | undefined;
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   constructor(runner: any, options: any) {
     const stats = runner.stats;
@@ -92,7 +88,7 @@ export class VagovCyTrReporter {
           )}`,
         );
 
-        // post results to TestRail.
+        // report results to TestRail.
         if (this._cyResults.length) {
           this._trAgent.reportResults(this._cyResults);
         } else {
