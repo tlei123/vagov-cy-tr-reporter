@@ -25,7 +25,7 @@ export class VagovCyTrReporter {
     this._trAgent = new TestRailAgent(this._cyRptrOpts);
     this._trLogger = new TestRailLogger();
 
-    this._trLogger.log('Using VA.GOV CYPRESS TESTRAIL REPORTER (VCTR)');
+    this._trLogger.log('Using VA.GOV CYPRESS TESTRAIL REPORTER (VCTR) v0.0.7');
 
     // validate reporterOptions, exit if incomplete/invalid.
     if (!utils.validateReporterOptions(this._cyRptrOpts)) {
