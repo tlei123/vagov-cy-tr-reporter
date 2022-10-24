@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { spawnSync } from 'child_process';
 
 import { TestRailOptions, TestRailResult } from './testrail.interface';
