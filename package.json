@@ -1,6 +1,6 @@
 {
   "name": "@tlei123/vagov-cy-tr-reporter",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Mocha custom reporter for Cypress and TestRail.  Customized for VA.gov front-end.",
   "repository": {
     "type": "git",
