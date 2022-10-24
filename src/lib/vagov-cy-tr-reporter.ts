@@ -48,33 +48,57 @@ export class VagovCyTrReporter {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .on(EVENT_TEST_PASS, (test: any) => {
         const title = test.title;
-        const duration = test.duration;
+        const durationStr = test.duration
+          ? utils.getTrElapsedStringFromMsecs(test.duration)
+          : '';
         const caseId = utils.getCaseIdFromTestTitle(title);
 
         this._cyCaseIds.push(caseId);
-        this._cyResults.push({
-          case_id: caseId,
-          status_id: Status.Passed,
-          elapsed: utils.getTrElapsedStringFromMsecs(duration),
-          comment: `Posted via VagovCyTrReporter.  Cypress test title: ${title}`,
-        });
-        this._trLogger.success(`  Pass [${duration}ms]: ${title}`);
+        if (durationStr) {
+          this._cyResults.push({
+            case_id: caseId,
+            status_id: Status.Passed,
+            elapsed: durationStr,
+            comment: `Posted via VagovCyTrReporter.  Cypress test title: ${title}`,
+          });
+        } else {
+          this._cyResults.push({
+            case_id: caseId,
+            status_id: Status.Passed,
+            comment: `Posted via VagovCyTrReporter.  Cypress test title: ${title}`,
+          });
+        }
+        this._trLogger.success(
+          `  Pass${durationStr ? ` [${durationStr}]` : ''}: ${title}`,
+        );
       })
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       .on(EVENT_TEST_FAIL, (test: any, err: any) => {
         const title = test.title;
-        const duration = test.duration;
+        const durationStr = test.duration
+          ? utils.getTrElapsedStringFromMsecs(test.duration)
+          : '';
         const caseId = utils.getCaseIdFromTestTitle(title);
 
         this._cyCaseIds.push(utils.getCaseIdFromTestTitle(title));
-        this._cyResults.push({
-          case_id: caseId,
-          status_id: Status.Failed,
-          elapsed: utils.getTrElapsedStringFromMsecs(test.duration),
-          comment: `Posted via VagovCyTrReporter.  Cypress test title: ${title}`,
-        });
+        if (durationStr) {
+          this._cyResults.push({
+            case_id: caseId,
+            status_id: Status.Failed,
+            elapsed: durationStr,
+            comment: `Posted via VagovCyTrReporter.  Cypress test title: ${title}`,
+          });
+        } else {
+          this._cyResults.push({
+            case_id: caseId,
+            status_id: Status.Failed,
+            comment: `Posted via VagovCyTrReporter.  Cypress test title: ${title}`,
+          });
+        }
         this._trLogger.error(
-          `  Fail [${duration}ms]: ${title} - error: ${err.message}`,
+          `  Fail${durationStr ? ` [${durationStr}]` : ''}: ${title} - error: ${
+            err.message
+          }`,
         );
       })
       .once(EVENT_RUN_END, () => {
