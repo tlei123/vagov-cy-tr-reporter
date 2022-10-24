@@ -71,6 +71,11 @@ function closeRun(runId: number) {
   });
 }
 
+// Handle axios promise rejections that aren't caught.
+process.on('unhandledRejection', (err) => {
+  trLogger.errorObj('axios promise REJECTED! ', err);
+});
+
 // Get cases, add run, add results, then close run.
 fetchCases()
   .then((response: any) => {
@@ -118,7 +123,6 @@ fetchCases()
                 trLogger.log(
                   "If output is missing when you scroll back to top of shell window, increase your shell's screen-buffer size.",
                 );
-                process.exit(1);
               });
           })
           .catch((err: any) => {
@@ -126,15 +130,10 @@ fetchCases()
             trLogger.log(
               "If output is missing when you scroll back to top of shell window, increase your shell's screen-buffer size.",
             );
-            process.exit(1);
           });
       })
       .catch((err: any) => {
         trLogger.errorObj('createRun method FAILED! ', err);
-        trLogger.log(
-          "If output is missing when you scroll back to top of shell window, increase your shell's screen-buffer size.",
-        );
-        process.exit(1);
       });
   })
   .catch((err: any) => {
@@ -142,6 +141,5 @@ fetchCases()
     trLogger.log(
       "If output is missing when you scroll back to top of shell window, increase your shell's screen-buffer size.",
     );
-    process.exit(1);
   });
 /* eslint-enable @typescript-eslint/no-explicit-any */
